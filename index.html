@@ -1,172 +1,328 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Trading Journal Pro</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Professional Forex Trading Journal</title>
 
 <style>
 body{
 font-family:Arial,sans-serif;
-background:#f4f6f9;
+background:#0f172a;
+color:white;
 margin:0;
 padding:20px;
 }
 
 .container{
-max-width:1000px;
+max-width:1200px;
 margin:auto;
 }
 
 h1{
 text-align:center;
-color:#1e3a8a;
+margin-bottom:20px;
+}
+
+.stats{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+gap:15px;
+margin-bottom:20px;
 }
 
 .card{
-background:white;
+background:#1e293b;
 padding:20px;
-margin-top:20px;
 border-radius:10px;
-box-shadow:0 2px 8px rgba(0,0,0,0.1);
+text-align:center;
 }
 
-input,select{
+.card h2{
+margin:0;
+color:#38bdf8;
+}
+
+.form{
+background:#1e293b;
+padding:20px;
+border-radius:10px;
+margin-bottom:20px;
+}
+
+input,select,textarea{
 width:100%;
 padding:10px;
-margin:5px 0;
+margin-top:10px;
+border:none;
+border-radius:5px;
 }
 
 button{
-background:#1e3a8a;
-color:white;
-padding:10px;
-border:none;
-cursor:pointer;
 width:100%;
+padding:12px;
+margin-top:10px;
+background:#2563eb;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+
+button:hover{
+background:#1d4ed8;
 }
 
 table{
 width:100%;
 border-collapse:collapse;
-margin-top:15px;
+background:#1e293b;
 }
 
 th,td{
-border:1px solid #ddd;
 padding:10px;
+border:1px solid #334155;
 text-align:center;
 }
 
 th{
-background:#1e3a8a;
+background:#2563eb;
+}
+
+.delete{
+background:red;
+padding:5px 10px;
+border:none;
 color:white;
+cursor:pointer;
+}
+
+.win{
+color:#22c55e;
+font-weight:bold;
+}
+
+.loss{
+color:#ef4444;
+font-weight:bold;
 }
 </style>
-</head>
 
+</head>
 <body>
 
 <div class="container">
 
-<h1>📈 Trading Journal Pro</h1>
+<h1>📈 Professional Forex Trading Journal</h1>
+
+<div class="stats">
 
 <div class="card">
-<h2>Account Statistics</h2>
-
-<p>Total Trades: <span id="totalTrades">0</span></p>
-<p>Wins: <span id="wins">0</span></p>
-<p>Losses: <span id="losses">0</span></p>
-<p>Win Rate: <span id="winRate">0</span>%</p>
-<p>Total P&L: $<span id="pnl">0</span></p>
-
+<h2 id="trades">0</h2>
+<p>Total Trades</p>
 </div>
 
 <div class="card">
+<h2 id="wins">0</h2>
+<p>Wins</p>
+</div>
+
+<div class="card">
+<h2 id="losses">0</h2>
+<p>Losses</p>
+</div>
+
+<div class="card">
+<h2 id="winRate">0%</h2>
+<p>Win Rate</p>
+</div>
+
+<div class="card">
+<h2 id="balance">$1000</h2>
+<p>Account Balance</p>
+</div>
+
+</div>
+
+<div class="form">
 
 <h2>Add Trade</h2>
 
+<input type="date" id="date">
+
 <input type="text" id="pair" placeholder="Pair (EURUSD)">
-<input type="number" id="profit" placeholder="Profit/Loss ($)">
+
+<input type="number" id="pnl" placeholder="Profit/Loss ($)">
+
+<input type="number" id="rr" placeholder="Risk Reward (e.g. 2)">
+
 <select id="result">
 <option value="Win">Win</option>
 <option value="Loss">Loss</option>
 </select>
 
+<textarea id="note" placeholder="Trade Notes"></textarea>
+
 <button onclick="addTrade()">Add Trade</button>
 
 </div>
 
-<div class="card">
-
 <h2>Trade History</h2>
 
 <table>
+
 <thead>
 <tr>
+<th>Date</th>
 <th>Pair</th>
 <th>P/L</th>
+<th>RR</th>
 <th>Result</th>
+<th>Notes</th>
+<th>Delete</th>
 </tr>
 </thead>
 
-<tbody id="tradeTable">
-</tbody>
+<tbody id="tradeTable"></tbody>
 
 </table>
 
 </div>
 
-</div>
-
 <script>
 
-let totalTrades=0;
-let wins=0;
-let losses=0;
-let pnl=0;
+let balance = 1000;
+
+let trades =
+JSON.parse(localStorage.getItem("journal")) || [];
+
+function saveData(){
+localStorage.setItem("journal",
+JSON.stringify(trades));
+}
+
+function updateDashboard(){
+
+let wins =
+trades.filter(t=>t.result==="Win").length;
+
+let losses =
+trades.filter(t=>t.result==="Loss").length;
+
+let totalTrades = trades.length;
+
+let totalPnl =
+trades.reduce((sum,t)=>sum+t.pnl,0);
+
+let currentBalance =
+1000 + totalPnl;
+
+let winRate =
+totalTrades>0
+? ((wins/totalTrades)*100).toFixed(1)
+: 0;
+
+document.getElementById("trades").innerText =
+totalTrades;
+
+document.getElementById("wins").innerText =
+wins;
+
+document.getElementById("losses").innerText =
+losses;
+
+document.getElementById("winRate").innerText =
+winRate + "%";
+
+document.getElementById("balance").innerText =
+"$" + currentBalance;
+
+renderTrades();
+}
+
+function renderTrades(){
+
+let table =
+document.getElementById("tradeTable");
+
+table.innerHTML="";
+
+trades.forEach((trade,index)=>{
+
+table.innerHTML += 
+<tr>
+<td>${trade.date}</td>
+<td>${trade.pair}</td>
+<td>$${trade.pnl}</td>
+<td>${trade.rr}</td>
+<td class="${trade.result==='Win'?'win':'loss'}">
+${trade.result}
+</td>
+<td>${trade.note}</td>
+<td>
+<button class="delete"
+onclick="deleteTrade(${index})">
+X
+</button>
+</td>
+</tr>
+;
+
+});
+
+}
 
 function addTrade(){
 
-let pair=document.getElementById("pair").value;
-let profit=parseFloat(document.getElementById("profit").value);
-let result=document.getElementById("result").value;
+let trade = {
 
-if(pair==="" || isNaN(profit)){
-alert("Fill all fields");
+date:
+document.getElementById("date").value,
+
+pair:
+document.getElementById("pair").value,
+
+pnl:
+Number(document.getElementById("pnl").value),
+
+rr:
+document.getElementById("rr").value,
+if(trade.pair===""){
+alert("Enter Pair");
 return;
 }
 
-totalTrades++;
+trades.push(trade);
 
-if(result==="Win"){
-wins++;
-}else{
-losses++;
-}
+saveData();
 
-pnl += profit;
-
-let winRate=((wins/totalTrades)*100).toFixed(2);
-
-document.getElementById("totalTrades").innerText=totalTrades;
-document.getElementById("wins").innerText=wins;
-document.getElementById("losses").innerText=losses;
-document.getElementById("winRate").innerText=winRate;
-document.getElementById("pnl").innerText=pnl.toFixed(2);
-
-let row=
-<tr>
-<td>${pair}</td>
-<td>${profit}</td>
-<td>${result}</td>
-</tr>;
-
-document.getElementById("tradeTable").innerHTML += row;
+updateDashboard();
 
 document.getElementById("pair").value="";
-document.getElementById("profit").value="";
+document.getElementById("pnl").value="";
+document.getElementById("rr").value="";
+document.getElementById("note").value="";
 }
+
+function deleteTrade(index){
+
+trades.splice(index,1);
+
+saveData();
+
+updateDashboard();
+}
+
+updateDashboard();
 
 </script>
 
 </body>
 </html>
+result:
+document.getElementById("result").value,
+
+note:
+document.getElementById("note").value
+
+};
