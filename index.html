@@ -1,230 +1,320 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Professional Forex Trading Journal</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trading Journal Pro FINAL</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body{
-font-family:Arial,sans-serif;
-background:#0f172a;
+margin:0;
+font-family:Arial;
+background:#0b1220;
 color:white;
-padding:20px;
 }
 
-h1{
+header{
+padding:15px;
 text-align:center;
+background:#111827;
+font-weight:bold;
+font-size:18px;
 }
 
-.stats{
+.nav{
 display:flex;
-gap:15px;
-justify-content:center;
-flex-wrap:wrap;
-margin-bottom:20px;
+gap:5px;
+padding:10px;
+background:#0f172a;
 }
+
+.nav button{
+flex:1;
+padding:10px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+background:#1e293b;
+color:white;
+}
+
+.nav button.active{
+background:#22c55e;
+}
+
+.container{padding:15px; max-width:1000px; margin:auto;}
 
 .card{
 background:#1e293b;
-padding:20px;
+padding:15px;
 border-radius:10px;
-width:180px;
-text-align:center;
+margin-bottom:15px;
 }
 
-input,select,textarea,button{
+input,select{
 width:100%;
 padding:10px;
-margin:5px 0;
-border-radius:5px;
+margin-top:6px;
 border:none;
+border-radius:6px;
 }
 
 button{
-background:#2563eb;
-color:white;
+padding:10px;
+width:100%;
+margin-top:6px;
+border:none;
+border-radius:6px;
 cursor:pointer;
+background:#22c55e;
+color:white;
+font-weight:bold;
 }
 
 table{
 width:100%;
-margin-top:20px;
 border-collapse:collapse;
-background:white;
-color:black;
+margin-top:10px;
 }
 
-th,td{
-padding:10px;
-border:1px solid #ddd;
+td,th{
+padding:8px;
+border-bottom:1px solid #334155;
 text-align:center;
 }
 
 img{
-width:100px;
+width:45px;
+height:45px;
+border-radius:6px;
+object-fit:cover;
+}
+
+.hidden{display:none;}
+
+.stat-grid{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:10px;
+}
+
+.stat{
+background:#334155;
+padding:10px;
+border-radius:8px;
+text-align:center;
 }
 </style>
-
 </head>
 
 <body>
 
-<h1>📈 Professional Forex Trading Journal</h1>
+<header>📊 Trading Journal FINAL PRO</header>
 
-<div class="stats">
+<div class="nav">
+<button class="active" onclick="showTab('journal')">Journal</button>
+<button onclick="showTab('stats')">Stats</button>
+<button onclick="showTab('chart')">Chart</button>
+</div>
+
+<div class="container">
+
+<!-- JOURNAL -->
+<div id="journal">
 
 <div class="card">
-<h2 id="totalTrades">0</h2>
-<p>Total Trades</p>
-</div>
+<h3>Add Trade</h3>
 
-<div class="card">
-<h2 id="wins">0</h2>
-<p>Wins</p>
-</div>
+<input id="pair" placeholder="Pair (EURUSD)">
+<input id="entry" type="number" placeholder="Entry">
+<input id="exit" type="number" placeholder="Exit">
 
-<div class="card">
-<h2 id="losses">0</h2>
-<p>Losses</p>
-</div>
-
-<div class="card">
-<h2 id="winRate">0%</h2>
-<p>Win Rate</p>
-</div>
-
-<div class="card">
-<h2 id="balance">$1000</h2>
-<p>Balance</p>
-</div>
-
-</div>
-
-<h2>Add Trade</h2>
-
-<input type="date" id="date">
-
-<input type="text" id="pair" placeholder="Pair (EURUSD)">
-
-<input type="number" id="profit" placeholder="Profit/Loss ($)">
-
-<input type="number" id="rr" placeholder="Risk Reward">
-
-<select id="result">
+<select id="type">
 <option>Win</option>
 <option>Loss</option>
+<option>Break Even</option>
+<option>Missed</option>
 </select>
 
-<textarea id="notes" placeholder="Trade Notes"></textarea>
-
-<input type="file" id="screenshot">
+<input type="file" id="img">
 
 <button onclick="addTrade()">Add Trade</button>
+<button onclick="resetAll()" style="background:#ef4444">Reset All</button>
+</div>
 
-<h2>Trade History</h2>
-
-<table id="tradeTable">
-
+<div class="card">
+<h3>History</h3>
+<table>
 <thead>
 <tr>
-<th>Date</th>
 <th>Pair</th>
+<th>Type</th>
 <th>P/L</th>
-<th>RR</th>
-<th>Result</th>
-<th>Notes</th>
-<th>Screenshot</th>
-<th>Delete</th>
+<th>Img</th>
+<th>Del</th>
 </tr>
 </thead>
-
-<tbody></tbody>
-
+<tbody id="table"></tbody>
 </table>
 
-<script>
+<div id="empty" style="text-align:center;opacity:0.6;margin-top:10px;"></div>
+</div>
 
-let totalTrades=0;
-let wins=0;
-let losses=0;
-let balance=1000;
+</div>
+
+<!-- STATS -->
+<div id="stats" class="hidden">
+<div class="card">
+<h3>Stats</h3>
+
+<div class="stat-grid">
+<div class="stat">Trades<br><span id="total">0</span></div>
+<div class="stat">Wins<br><span id="wins">0</span></div>
+<div class="stat">Loss<br><span id="losses">0</span></div>
+<div class="stat">Net P/L<br><span id="net">0</span></div>
+</div>
+
+</div>
+</div>
+
+<!-- CHART -->
+<div id="chart" class="hidden">
+<div class="card">
+<h3>Equity Curve</h3>
+<canvas id="c"></canvas>
+</div>
+</div>
+
+</div>
+
+<script>
+let trades = JSON.parse(localStorage.getItem("trades")) || [];
+
+function save(){
+localStorage.setItem("trades", JSON.stringify(trades));
+}
+
+function calc(entry,exit){
+if(!entry||!exit) return 0;
+return exit-entry;
+}
 
 function addTrade(){
-
-let date=document.getElementById("date").value;
 let pair=document.getElementById("pair").value;
-let profit=parseFloat(document.getElementById("profit").value);
-let rr=document.getElementById("rr").value;
-let result=document.getElementById("result").value;
-let notes=document.getElementById("notes").value;
-let file=document.getElementById("screenshot").files[0];
+let entry=parseFloat(document.getElementById("entry").value);
+let exit=parseFloat(document.getElementById("exit").value);
+let type=document.getElementById("type").value;
+let file=document.getElementById("img").files[0];
 
-if(!date  !pair  isNaN(profit)){
-alert("Fill all fields");
-return;
-}
+if(!pair) return alert("Enter pair");
 
-totalTrades++;
-
-if(result==="Win"){
-wins++;
-}else{
-losses++;
-}
-
-balance+=profit;
-
-let winRate=((wins/totalTrades)*100).toFixed(1);
-
-document.getElementById("totalTrades").innerText=totalTrades;
-document.getElementById("wins").innerText=wins;
-document.getElementById("losses").innerText=losses;
-document.getElementById("winRate").innerText=winRate+"%";
-document.getElementById("balance").innerText="$"+balance;
-
-let table=document.querySelector("#tradeTable tbody");
-
-let row=table.insertRow();
-
-row.insertCell(0).innerText=date;
-row.insertCell(1).innerText=pair;
-row.insertCell(2).innerText="$"+profit;
-row.insertCell(3).innerText=rr;
-row.insertCell(4).innerText=result;
-row.insertCell(5).innerText=notes;
-
-let imgCell=row.insertCell(6);
-
-if(file){
+let profit = calc(entry,exit);
+if(type==="Missed"||type==="Break Even") profit=0;
 
 let reader=new FileReader();
 
 reader.onload=function(e){
 
-imgCell.innerHTML=
-'<img src="'+e.target.result+'">';
+trades.push({
+pair,entry,exit,type,profit,
+img:e.target.result||""
+});
 
-}
-
-reader.readAsDataURL(file);
-
-}
-
-let deleteCell=row.insertCell(7);
-
-let btn=document.createElement("button");
-
-btn.innerText="Delete";
-
-btn.onclick=function(){
-
-row.remove();
-
+save();
+render();
 };
 
-deleteCell.appendChild(btn);
-
+if(file) reader.readAsDataURL(file);
+else reader.onload({target:{result:""}});
 }
 
+function deleteTrade(i){
+trades.splice(i,1);
+save();
+render();
+}
+
+function resetAll(){
+if(confirm("Delete all trades?")){
+trades=[];
+save();
+render();
+}
+}
+
+function render(){let t=document.getElementById("table");
+t.innerHTML="";
+
+let wins=0,loss=0,net=0;
+
+if(trades.length===0){
+document.getElementById("empty").innerText="No trades yet...";
+}else{
+document.getElementById("empty").innerText="";
+}
+
+let equity=[];
+
+trades.forEach((x,i)=>{
+net+=x.profit;
+equity.push(net);
+
+if(x.type==="Win") wins++;
+else if(x.type==="Loss") loss++;
+
+t.innerHTML+=
+<tr>
+<td>${x.pair}</td>
+<td>${x.type}</td>
+<td>${x.profit}</td>
+<td>${x.img?<img src="${x.img}">:"-"}</td>
+<td><button onclick="deleteTrade(${i})">X</button></td>
+</tr>;
+});
+
+document.getElementById("total").innerText=trades.length;
+document.getElementById("wins").innerText=wins;
+document.getElementById("losses").innerText=loss;
+document.getElementById("net").innerText=net.toFixed(2);
+
+draw(equity);
+}
+
+let chart;
+
+function draw(data){
+if(chart) chart.destroy();
+
+chart=new Chart(document.getElementById("c"),{
+type:"line",
+data:{
+labels:data.map((_,i)=>i+1),
+datasets:[{
+data:data,
+borderColor:"#22c55e",
+fill:false
+}]
+}
+});
+}
+
+function showTab(tab){
+document.getElementById("journal").classList.add("hidden");
+document.getElementById("stats").classList.add("hidden");
+document.getElementById("chart").classList.add("hidden");
+
+document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+
+if(tab==="journal") document.querySelectorAll(".nav button")[0].classList.add("active");
+if(tab==="stats") document.querySelectorAll(".nav button")[1].classList.add("active");
+if(tab==="chart") document.querySelectorAll(".nav button")[2].classList.add("active");
+
+document.getElementById(tab).classList.remove("hidden");
+}
+
+render();
 </script>
 
 </body>
