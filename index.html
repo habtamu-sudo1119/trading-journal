@@ -1,21 +1,172 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>My Forex Trading Journal</title>
+<title>Trading Journal Pro</title>
+
+<style>
+body{
+font-family:Arial,sans-serif;
+background:#f4f6f9;
+margin:0;
+padding:20px;
+}
+
+.container{
+max-width:1000px;
+margin:auto;
+}
+
+h1{
+text-align:center;
+color:#1e3a8a;
+}
+
+.card{
+background:white;
+padding:20px;
+margin-top:20px;
+border-radius:10px;
+box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+input,select{
+width:100%;
+padding:10px;
+margin:5px 0;
+}
+
+button{
+background:#1e3a8a;
+color:white;
+padding:10px;
+border:none;
+cursor:pointer;
+width:100%;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:15px;
+}
+
+th,td{
+border:1px solid #ddd;
+padding:10px;
+text-align:center;
+}
+
+th{
+background:#1e3a8a;
+color:white;
+}
+</style>
 </head>
+
 <body>
-    <h1>My Forex Trading Journal</h1>
 
-    <h2>Account Statistics</h2>
-    <p>Balance: $1000</p>
-    <p>Total Trades: 0</p>
-    <p>Win Rate: 0%</p>
+<div class="container">
 
-    <h2>Trading Goals</h2>
-    <ul>
-        <li>Follow my trading plan</li>
-        <li>Risk only 1% per trade</li>
-        <li>Review trades daily</li>
-    </ul>
+<h1>📈 Trading Journal Pro</h1>
+
+<div class="card">
+<h2>Account Statistics</h2>
+
+<p>Total Trades: <span id="totalTrades">0</span></p>
+<p>Wins: <span id="wins">0</span></p>
+<p>Losses: <span id="losses">0</span></p>
+<p>Win Rate: <span id="winRate">0</span>%</p>
+<p>Total P&L: $<span id="pnl">0</span></p>
+
+</div>
+
+<div class="card">
+
+<h2>Add Trade</h2>
+
+<input type="text" id="pair" placeholder="Pair (EURUSD)">
+<input type="number" id="profit" placeholder="Profit/Loss ($)">
+<select id="result">
+<option value="Win">Win</option>
+<option value="Loss">Loss</option>
+</select>
+
+<button onclick="addTrade()">Add Trade</button>
+
+</div>
+
+<div class="card">
+
+<h2>Trade History</h2>
+
+<table>
+<thead>
+<tr>
+<th>Pair</th>
+<th>P/L</th>
+<th>Result</th>
+</tr>
+</thead>
+
+<tbody id="tradeTable">
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<script>
+
+let totalTrades=0;
+let wins=0;
+let losses=0;
+let pnl=0;
+
+function addTrade(){
+
+let pair=document.getElementById("pair").value;
+let profit=parseFloat(document.getElementById("profit").value);
+let result=document.getElementById("result").value;
+
+if(pair==="" || isNaN(profit)){
+alert("Fill all fields");
+return;
+}
+
+totalTrades++;
+
+if(result==="Win"){
+wins++;
+}else{
+losses++;
+}
+
+pnl += profit;
+
+let winRate=((wins/totalTrades)*100).toFixed(2);
+
+document.getElementById("totalTrades").innerText=totalTrades;
+document.getElementById("wins").innerText=wins;
+document.getElementById("losses").innerText=losses;
+document.getElementById("winRate").innerText=winRate;
+document.getElementById("pnl").innerText=pnl.toFixed(2);
+
+let row=
+<tr>
+<td>${pair}</td>
+<td>${profit}</td>
+<td>${result}</td>
+</tr>;
+
+document.getElementById("tradeTable").innerHTML += row;
+
+document.getElementById("pair").value="";
+document.getElementById("profit").value="";
+}
+
+</script>
+
 </body>
 </html>
